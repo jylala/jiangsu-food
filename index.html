@@ -1041,13 +1041,12 @@ function openModal(food, cityName, districtName) {
     if (food.shops && food.shops.length > 0) {
         shopSection.classList.remove('hidden');
         var shopListHtml = food.shops.map(function(s) {
-            var addr = s.replace(/^[^（（]+[（（]/, '').replace(/[）)][:：]/g, '').replace(/[）)]$/, '');
-            var mapUrl = 'https://uri.amap.com/search?keyword=' + encodeURIComponent(s);
+            var mapUrl = 'https://uri.amap.com/navigation?to=' + encodeURIComponent(s) + '&mode=bus&src=jsgourmet';
             return '<div class="shop-item"><a href="' + mapUrl + '" target="_blank" rel="noopener" class="shop-link">📍 ' + s + '</a></div>';
         }).join('');
         shopContent.innerHTML = shopListHtml;
     } else if (food.shop) {
-        var mapUrl2 = 'https://uri.amap.com/search?keyword=' + encodeURIComponent(food.shop);
+        var mapUrl2 = 'https://uri.amap.com/navigation?to=' + encodeURIComponent(food.shop) + '&mode=bus&src=jsgourmet';
         shopSection.classList.remove('hidden');
         shopContent.innerHTML = '<div class="shop-item"><a href="' + mapUrl2 + '" target="_blank" rel="noopener" class="shop-link">📍 ' + food.shop + '</a></div>';
     } else {
@@ -1085,11 +1084,10 @@ function bindModalTabs() {
             var targetSection = document.getElementById(targetId);
             if (targetSection) {
                 var modalBodyEl2 = document.querySelector('.modal-body');
-                if (modalBodyEl2 && targetSection) {
-                    modalBodyEl2.scrollTo({ top: targetSection.offsetTop - modalBodyEl2.offsetTop - 50, behavior: 'smooth' });
+                if (modalBodyEl2) {
+                    modalBodyEl2.scrollTo({ top: targetSection.offsetTop - 50, behavior: 'smooth' });
                 }
             }
-            // 更新高亮
             document.querySelectorAll('.modal-tab').forEach(function(t) {
                 t.classList.remove('active');
             });
@@ -1097,27 +1095,27 @@ function bindModalTabs() {
         };
     });
     
-    // 监听滚动，更新tab高亮
     var modalBodyEl = document.querySelector('.modal-body');
     var sections = ['desc-section', 'story-section', 'compare-section', 'shop-section'];
     
     if (modalBodyEl) {
-    modalBodyEl.onscroll = function() {
-        var scrollPos = modalBody.scrollTop;
-        var activeTab = 'desc-section';
-        
-        sections.forEach(function(sectionId) {
-            var section = document.getElementById(sectionId);
-            if (section && section.offsetTop <= scrollPos + 100) {
-                activeTab = sectionId;
-            }
-        });
-        
-        document.querySelectorAll('.modal-tab').forEach(function(tab) {
-            tab.classList.toggle('active', tab.getAttribute('data-target') === activeTab);
-        });
-    };
+        modalBodyEl.onscroll = function() {
+            var scrollPos = modalBodyEl.scrollTop;
+            var activeTab = 'desc-section';
+            
+            sections.forEach(function(sectionId) {
+                var section = document.getElementById(sectionId);
+                if (section && section.offsetTop <= scrollPos + 100) {
+                    activeTab = sectionId;
+                }
+            });
+            
+            document.querySelectorAll('.modal-tab').forEach(function(tab) {
+                tab.classList.toggle('active', tab.getAttribute('data-target') === activeTab);
+            });
+        };
     }
+}
 
 document.getElementById('modal').addEventListener('click', function(e) {
     if (e.target === this) closeModal();
