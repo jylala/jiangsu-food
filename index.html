@@ -1041,12 +1041,16 @@ function openModal(food, cityName, districtName) {
     if (food.shops && food.shops.length > 0) {
         shopSection.classList.remove('hidden');
         var shopListHtml = food.shops.map(function(s) {
-            var mapUrl = 'https://uri.amap.com/navigation?to=' + encodeURIComponent(s) + '&mode=bus&src=jsgourmet';
+            var shopName = s.replace(/[（(].+?[）)]/, '').trim();
+            var shopAddr = (s.match(/[（(](.+?)[）)]/) || [,''])[1];
+            var mapUrl = 'https://uri.amap.com/navigation?to=' + encodeURIComponent(shopAddr || shopName) + '&name=' + encodeURIComponent(shopName) + '&mode=car&src=jsgourmet&policy=1';
             return '<div class="shop-item"><a href="' + mapUrl + '" target="_blank" rel="noopener" class="shop-link">📍 ' + s + '</a></div>';
         }).join('');
         shopContent.innerHTML = shopListHtml;
     } else if (food.shop) {
-        var mapUrl2 = 'https://uri.amap.com/navigation?to=' + encodeURIComponent(food.shop) + '&mode=bus&src=jsgourmet';
+        var shopName2 = food.shop.replace(/[（(].+?[）)]/, '').trim();
+        var shopAddr2 = (food.shop.match(/[（(](.+?)[）)]/) || [,''])[1];
+        var mapUrl2 = 'https://uri.amap.com/navigation?to=' + encodeURIComponent(shopAddr2 || shopName2) + '&name=' + encodeURIComponent(shopName2) + '&mode=car&src=jsgourmet&policy=1';
         shopSection.classList.remove('hidden');
         shopContent.innerHTML = '<div class="shop-item"><a href="' + mapUrl2 + '" target="_blank" rel="noopener" class="shop-link">📍 ' + food.shop + '</a></div>';
     } else {
@@ -1085,7 +1089,10 @@ function bindModalTabs() {
             if (targetSection) {
                 var modalBodyEl2 = document.querySelector('.modal-body');
                 if (modalBodyEl2) {
-                    modalBodyEl2.scrollTo({ top: targetSection.offsetTop - 50, behavior: 'smooth' });
+                    var rect = targetSection.getBoundingClientRect();
+                    var containerRect = modalBodyEl2.getBoundingClientRect();
+                    var tabHeight = document.querySelector('.modal-tabs') ? document.querySelector('.modal-tabs').offsetHeight : 0;
+                    modalBodyEl2.scrollTo({ top: modalBodyEl2.scrollTop + rect.top - containerRect.top - tabHeight, behavior: 'smooth' });
                 }
             }
             document.querySelectorAll('.modal-tab').forEach(function(t) {
