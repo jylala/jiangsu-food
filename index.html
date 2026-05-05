@@ -1049,19 +1049,18 @@ function openModal(food, cityName, districtName) {
         shopSection.classList.remove('hidden');
         var shopListHtml = food.shops.map(function(s) {
             var sName = s.replace(/[（(].+?[）)]/, '').trim();
-            var mapUrl = 'https://uri.amap.com/search?keyword=' + encodeURIComponent(sName) + ', '&city=' + encodeURIComponent(cityName || '');
-            return '<div class="shop-item"><a href="' + mapUrl + '" target="_blank" class="shop-nav-link">📍 ' + s + '</a></div>';
+            var mapUrl = 'https://uri.amap.com/search?keyword=' + encodeURIComponent(sName) + '&city=' + encodeURIComponent(cityName || '') + '&callnative=1';
+            return '<div class="shop-item"><a href="' + mapUrl + '" class="shop-nav-link">📍 ' + s + '</a></div>';
         }).join('');
         shopContent.innerHTML = shopListHtml;
     } else if (food.shop) {
         shopSection.classList.remove('hidden');
         var sName2 = food.shop.replace(/[（(].+?[）)]/, '').trim();
-        var mapUrl2 = 'https://uri.amap.com/search?keyword=' + encodeURIComponent(sName2) + '&city=' + encodeURIComponent(cityName || '');
-        shopContent.innerHTML = '<div class="shop-item"><a href="' + mapUrl2 + '" target="_blank" class="shop-nav-link">📍 ' + food.shop + '</a></div>';
+        var mapUrl2 = 'https://uri.amap.com/search?keyword=' + encodeURIComponent(sName2) + '&city=' + encodeURIComponent(cityName || '') + '&callnative=1';
+        shopContent.innerHTML = '<div class="shop-item"><a href="' + mapUrl2 + '" class="shop-nav-link">📍 ' + food.shop + '</a></div>';
     } else {
         shopSection.classList.add('hidden');
     }
-    var modalBody = document.querySelector('.modal-body');
     if (modalBody) modalBody.scrollTop = 0;
     
     document.getElementById('modal').classList.add('show');
