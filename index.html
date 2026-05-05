@@ -1049,17 +1049,16 @@ function openModal(food, cityName, districtName) {
         shopSection.classList.remove('hidden');
         var shopListHtml = food.shops.map(function(s) {
             var sName = s.replace(/[（(].+?[）)]/, '').trim();
-            var appUrl = 'amapuri://route/plan/?dname=' + encodeURIComponent(sName) + '&dev=0&t=0';
-            var webUrl = 'https://uri.amap.com/navigation?to=' + encodeURIComponent(sName) + '&mode=car&callnative=1&src=jsgourmet';
-            return '<div class="shop-item"><a href="' + appUrl + '" onclick="event.preventDefault();navToShop(\''+sName.replace(/'/g,"\\'")+'\')" class="shop-nav-link">📍 ' + s + '</a></div>';
+            return '<div class="shop-item"><a href="#" data-shop-name="' + encodeURIComponent(sName) + '" class="shop-nav-link">📍 ' + s + '</a></div>';
         }).join('');
         shopContent.innerHTML = shopListHtml;
     } else if (food.shop) {
         shopSection.classList.remove('hidden');
         var sName2 = food.shop.replace(/[（(].+?[）)]/, '').trim();
-        shopContent.innerHTML = '<div class="shop-item"><a href="#" onclick="event.preventDefault();navToShop(\''+sName2.replace(/'/g,"\\'")+'\')" class="shop-nav-link">📍 ' + food.shop + '</a></div>';
+        shopContent.innerHTML = '<div class="shop-item"><a href="#" data-shop-name="' + encodeURIComponent(sName2) + '" class="shop-nav-link">📍 ' + food.shop + '</a></div>';
+    } else {
+        shopSection.classList.add('hidden');
     }
-    
     // Reset scroll and tabs
     var modalBody = document.querySelector('.modal-body');
     if (modalBody) modalBody.scrollTop = 0;
@@ -1079,17 +1078,21 @@ function formatContent(text) {
 }
 
 
-// 一键导航到店铺：先尝试唤起高德App，失败则跳网页版
+// 一键导航到店铺
 function navToShop(shopName) {
-    var appUrl = 'amapuri://route/plan/?dname=' + encodeURIComponent(shopName) + '&dev=0&t=0';
-    var webUrl = 'https://uri.amap.com/navigation?to=' + encodeURIComponent(shopName) + '&mode=car&callnative=1&src=jsgourmet';
-    // 尝试打开高德App
-    window.location.href = appUrl;
-    // 2秒后如果还在当前页面，说明App没打开，跳网页版
-    setTimeout(function() {
-        window.open(webUrl, '_blank');
-    }, 2000);
+    var webUrl = 'https://uri.amap.com/navigation?to=' + encodeURIComponent(shopName) + '&name=' + encodeURIComponent(shopName) + '&mode=car&callnative=1&src=jsgourmet';
+    window.location.href = webUrl;
 }
+
+// 店铺导航点击事件委托
+document.addEventListener('click', function(e) {
+    var link = e.target.closest('.shop-nav-link');
+    if (link) {
+        e.preventDefault();
+        var shopName = decodeURIComponent(link.getAttribute('data-shop-name') || '');
+        if (shopName) navToShop(shopName);
+    }
+});
 
 function closeModal() {
     document.getElementById('modal').classList.remove('show');
