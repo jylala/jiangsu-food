@@ -563,16 +563,38 @@ body {
     transform: translateX(4px);
     box-shadow: 0 2px 8px rgba(139,69,19,0.1);
 }
-.shop-nav-link {
-    color: #5a3e2b;
-    text-decoration: none;
-    display: block;
-    transition: color 0.2s;
-    cursor: pointer;
+.shop-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 14px;
+    background: #fff8f0;
+    border-radius: 10px;
+    margin-bottom: 8px;
+    box-shadow: 0 1px 4px rgba(139,69,19,0.06);
 }
-.shop-nav-link:hover {
-    color: #d4764e;
-    text-decoration: underline;
+.shop-addr {
+    flex: 1;
+    color: #5a3e2b;
+    font-size: 0.92rem;
+    line-height: 1.5;
+}
+.shop-nav-btn {
+    display: inline-block;
+    padding: 4px 14px;
+    background: linear-gradient(135deg, #e8926a, #d4764e);
+    color: #fff;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 2px 6px rgba(212,118,78,0.25);
+}
+.shop-nav-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 3px 10px rgba(212,118,78,0.35);
 }
 .shops-list {
     display: flex;
@@ -1050,18 +1072,17 @@ function openModal(food, cityName, districtName) {
         var shopListHtml = food.shops.map(function(s) {
             var sName = s.replace(/[（(].+?[）)]/, '').trim();
             var mapUrl = 'https://uri.amap.com/search?keyword=' + encodeURIComponent(sName) + '&city=' + encodeURIComponent(cityName || '') + '&callnative=1';
-            return '<div class="shop-item"><a href="' + mapUrl + '" class="shop-nav-link">📍 ' + s + '</a></div>';
+            return '<div class="shop-item"><span class="shop-addr">📍 ' + s + '</span><a href="' + mapUrl + '" target="_blank" rel="noopener" class="shop-nav-btn">导航</a></div>';
         }).join('');
         shopContent.innerHTML = shopListHtml;
     } else if (food.shop) {
         shopSection.classList.remove('hidden');
         var sName2 = food.shop.replace(/[（(].+?[）)]/, '').trim();
         var mapUrl2 = 'https://uri.amap.com/search?keyword=' + encodeURIComponent(sName2) + '&city=' + encodeURIComponent(cityName || '') + '&callnative=1';
-        shopContent.innerHTML = '<div class="shop-item"><a href="' + mapUrl2 + '" class="shop-nav-link">📍 ' + food.shop + '</a></div>';
+        shopContent.innerHTML = '<div class="shop-item"><span class="shop-addr">📍 ' + food.shop + '</span><a href="' + mapUrl2 + '" target="_blank" rel="noopener" class="shop-nav-btn">导航</a></div>';
     } else {
         shopSection.classList.add('hidden');
     }
-    if (modalBody) modalBody.scrollTop = 0;
     
     document.getElementById('modal').classList.add('show');
     document.body.style.overflow = 'hidden';
