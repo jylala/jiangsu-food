@@ -564,10 +564,7 @@ body {
     box-shadow: 0 2px 8px rgba(139,69,19,0.1);
 }
 .shop-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
+    
     padding: 10px 14px;
     background: #fff8f0;
     border-radius: 10px;
@@ -580,22 +577,8 @@ body {
     font-size: 0.92rem;
     line-height: 1.5;
 }
-.shop-nav-btn {
-    display: inline-block;
-    padding: 4px 14px;
-    background: linear-gradient(135deg, #e8926a, #d4764e);
-    color: #fff;
-    border-radius: 20px;
-    font-size: 0.82rem;
-    text-decoration: none;
-    white-space: nowrap;
-    transition: transform 0.15s, box-shadow 0.15s;
-    box-shadow: 0 2px 6px rgba(212,118,78,0.25);
-}
-.shop-nav-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 3px 10px rgba(212,118,78,0.35);
-}
+
+
 .shops-list {
     display: flex;
     flex-direction: column;
@@ -1041,33 +1024,6 @@ function renderFoodData() {
 }
 
 // ==================== 模态窗口 ====================
-// ==================== 导航功能 ====================
-function openNav(shopName, cityName) {
-    // 尝试获取当前位置，然后打开高德导航
-    // 方案1：有定位 -> navigation URL（起点自动用当前位置）
-    // 方案2：无定位 -> 降级到 search URL
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            function(pos) {
-                var lat = pos.coords.latitude;
-                var lng = pos.coords.longitude;
-                var navUrl = 'https://uri.amap.com/navigation?from=' + lng + ',' + lat + ',我的位置&to=' + encodeURIComponent(shopName + ' ' + (cityName || '')) + '&mode=transit&callnative=1&src=jiangsuFood';
-                window.location.href = navUrl;
-            },
-            function(err) {
-                // 定位失败，降级到搜索
-                var searchUrl = 'https://uri.amap.com/search?keyword=' + encodeURIComponent(shopName) + '&city=' + encodeURIComponent(cityName || '') + '&callnative=1';
-                window.location.href = searchUrl;
-            },
-            { timeout: 5000, enableHighAccuracy: false }
-        );
-    } else {
-        // 不支持定位，直接搜索
-        var searchUrl = 'https://uri.amap.com/search?keyword=' + encodeURIComponent(shopName) + '&city=' + encodeURIComponent(cityName || '') + '&callnative=1';
-        window.location.href = searchUrl;
-    }
-}
-
 function openModal(food, cityName, districtName) {
     document.getElementById('modal-title').textContent = food.name;
     document.getElementById('modal-location').textContent = cityName + ' · ' + districtName;
@@ -1112,12 +1068,7 @@ function openModal(food, cityName, districtName) {
     } else if (food.shop) {
         shopSection.classList.remove('hidden');
         var sName2 = food.shop.replace(/[（(].+?[）)]/, '').trim();
-        shopContent.innerHTML = '<div class="shop-item"><span class="shop-addr">📍 ' + food.shop + '</span><a href="javascript:void(0)" id="nav-btn-single" class="shop-nav-btn" data-sname="' + sName2.replace(/"/g, '&quot;') + '" data-city="' + (cityName || '').replace(/"/g, '&quot;') + '">导航</a></div>';
-        document.getElementById('nav-btn-single').addEventListener('click', function() {
-            var name = this.getAttribute('data-sname');
-            var city = this.getAttribute('data-city');
-            openNav(name, city);
-        });
+        shopContent.innerHTML = '<div class="shop-item"><span class="shop-addr">📍 ' + food.shop + '</span></div>';
     } else {
         shopSection.classList.add('hidden');
     }
