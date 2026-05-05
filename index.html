@@ -1049,17 +1049,18 @@ function openModal(food, cityName, districtName) {
         shopSection.classList.remove('hidden');
         var shopListHtml = food.shops.map(function(s) {
             var sName = s.replace(/[（(].+?[）)]/, '').trim();
-            return '<div class="shop-item"><a href="#" data-shop-name="' + encodeURIComponent(sName) + '" class="shop-nav-link">📍 ' + s + '</a></div>';
+            var mapUrl = 'https://uri.amap.com/search?keyword=' + encodeURIComponent(sName) + ', '&city=' + encodeURIComponent(cityName || '');
+            return '<div class="shop-item"><a href="' + mapUrl + '" target="_blank" class="shop-nav-link">📍 ' + s + '</a></div>';
         }).join('');
         shopContent.innerHTML = shopListHtml;
     } else if (food.shop) {
         shopSection.classList.remove('hidden');
         var sName2 = food.shop.replace(/[（(].+?[）)]/, '').trim();
-        shopContent.innerHTML = '<div class="shop-item"><a href="#" data-shop-name="' + encodeURIComponent(sName2) + '" class="shop-nav-link">📍 ' + food.shop + '</a></div>';
+        var mapUrl2 = 'https://uri.amap.com/search?keyword=' + encodeURIComponent(sName2) + '&city=' + encodeURIComponent(cityName || '');
+        shopContent.innerHTML = '<div class="shop-item"><a href="' + mapUrl2 + '" target="_blank" class="shop-nav-link">📍 ' + food.shop + '</a></div>';
     } else {
         shopSection.classList.add('hidden');
     }
-    // Reset scroll and tabs
     var modalBody = document.querySelector('.modal-body');
     if (modalBody) modalBody.scrollTop = 0;
     
@@ -1078,21 +1079,7 @@ function formatContent(text) {
 }
 
 
-// 一键导航到店铺
-function navToShop(shopName) {
-    var webUrl = 'https://uri.amap.com/navigation?to=' + encodeURIComponent(shopName) + '&name=' + encodeURIComponent(shopName) + '&mode=car&callnative=1&src=jsgourmet';
-    window.location.href = webUrl;
-}
-
-// 店铺导航点击事件委托
-document.addEventListener('click', function(e) {
-    var link = e.target.closest('.shop-nav-link');
-    if (link) {
-        e.preventDefault();
-        var shopName = decodeURIComponent(link.getAttribute('data-shop-name') || '');
-        if (shopName) navToShop(shopName);
-    }
-});
+// 店铺导航：点击直接跳转高德搜索
 
 function closeModal() {
     document.getElementById('modal').classList.remove('show');
