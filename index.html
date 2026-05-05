@@ -563,6 +563,17 @@ body {
     transform: translateX(4px);
     box-shadow: 0 2px 8px rgba(139,69,19,0.1);
 }
+.shop-nav-link {
+    color: #5a3e2b;
+    text-decoration: none;
+    display: block;
+    transition: color 0.2s;
+    cursor: pointer;
+}
+.shop-nav-link:hover {
+    color: #d4764e;
+    text-decoration: underline;
+}
 .shops-list {
     display: flex;
     flex-direction: column;
@@ -600,6 +611,10 @@ body {
 
 /* ==================== 弹窗导航栏 ==================== */
 .modal-tabs {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #faf8f5;
     display: flex;
     justify-content: center;
     gap: 8px;
@@ -1033,12 +1048,20 @@ function openModal(food, cityName, districtName) {
     if (food.shops && food.shops.length > 0) {
         shopSection.classList.remove('hidden');
         var shopListHtml = food.shops.map(function(s) {
-            return '<div class="shop-item">📍 ' + s + '</div>';
+            var sName = s.replace(/[（(].+?[）)]/, '').trim();
+            var sAddr = (s.match(/[（(](.+?)[）)]/) || [,''])[1];
+            var navTo = sAddr || s;
+            var mapUrl = 'https://uri.amap.com/navigation?to=' + encodeURIComponent(navTo) + '&name=' + encodeURIComponent(sName) + '&mode=car&callnative=1&src=jsgourmet';
+            return '<div class="shop-item"><a href="' + mapUrl + '" target="_blank" class="shop-nav-link">📍 ' + s + '</a></div>';
         }).join('');
         shopContent.innerHTML = shopListHtml;
     } else if (food.shop) {
         shopSection.classList.remove('hidden');
-        shopContent.innerHTML = '<div class="shop-item">📍 ' + food.shop + '</div>';
+        var sName2 = food.shop.replace(/[（(].+?[）)]/, '').trim();
+        var sAddr2 = (food.shop.match(/[（(](.+?)[）)]/) || [,''])[1];
+        var navTo2 = sAddr2 || food.shop;
+        var mapUrl2 = 'https://uri.amap.com/navigation?to=' + encodeURIComponent(navTo2) + '&name=' + encodeURIComponent(sName2) + '&mode=car&callnative=1&src=jsgourmet';
+        shopContent.innerHTML = '<div class="shop-item"><a href="' + mapUrl2 + '" target="_blank" class="shop-nav-link">📍 ' + food.shop + '</a></div>';
     } else {
         shopSection.classList.add('hidden');
     }
@@ -1075,10 +1098,14 @@ function bindModalTabs() {
             if (targetSection) {
                 var modalBodyEl2 = document.querySelector('.modal-body');
                 if (modalBodyEl2) {
-                    var rect = targetSection.getBoundingClientRect();
-                    var containerRect = modalBodyEl2.getBoundingClientRect();
-                    var tabHeight = document.querySelector('.modal-tabs') ? document.querySelector('.modal-tabs').offsetHeight : 0;
-                    modalBodyEl2.scrollTo({ top: modalBodyEl2.scrollTop + rect.top - containerRect.top - tabHeight, behavior: 'smooth' });
+                    var topOffset = 0;
+                    var el = targetSection;
+                    while (el && el !== modalBodyEl2) {
+                        topOffset += el.offsetTop;
+                        el = el.offsetParent;
+                    }
+                    var tabH = document.querySelector('.modal-tabs') ? document.querySelector('.modal-tabs').offsetHeight : 0;
+                    modalBodyEl2.scrollTo({ top: topOffset - tabH, behavior: 'smooth' });
                 }
             }
             document.querySelectorAll('.modal-tab').forEach(function(t) {
