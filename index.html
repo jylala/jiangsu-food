@@ -1041,6 +1041,33 @@ function renderFoodData() {
 }
 
 // ==================== 模态窗口 ====================
+// ==================== 导航功能 ====================
+function openNav(shopName, cityName) {
+    // 尝试获取当前位置，然后打开高德导航
+    // 方案1：有定位 -> navigation URL（起点自动用当前位置）
+    // 方案2：无定位 -> 降级到 search URL
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            function(pos) {
+                var lat = pos.coords.latitude;
+                var lng = pos.coords.longitude;
+                var navUrl = 'https://uri.amap.com/navigation?from=' + lng + ',' + lat + ',我的位置&to=' + encodeURIComponent(shopName + ' ' + (cityName || '')) + '&mode=transit&callnative=1&src=jiangsuFood';
+                window.location.href = navUrl;
+            },
+            function(err) {
+                // 定位失败，降级到搜索
+                var searchUrl = 'https://uri.amap.com/search?keyword=' + encodeURIComponent(shopName) + '&city=' + encodeURIComponent(cityName || '') + '&callnative=1';
+                window.location.href = searchUrl;
+            },
+            { timeout: 5000, enableHighAccuracy: false }
+        );
+    } else {
+        // 不支持定位，直接搜索
+        var searchUrl = 'https://uri.amap.com/search?keyword=' + encodeURIComponent(shopName) + '&city=' + encodeURIComponent(cityName || '') + '&callnative=1';
+        window.location.href = searchUrl;
+    }
+}
+
 function openModal(food, cityName, districtName) {
     document.getElementById('modal-title').textContent = food.name;
     document.getElementById('modal-location').textContent = cityName + ' · ' + districtName;
@@ -1069,17 +1096,28 @@ function openModal(food, cityName, districtName) {
     var shopContent = document.getElementById('modal-shop');
     if (food.shops && food.shops.length > 0) {
         shopSection.classList.remove('hidden');
-        var shopListHtml = food.shops.map(function(s) {
+        var shopListHtml = food.shops.map(function(s, idx) {
             var sName = s.replace(/[（(].+?[）)]/, '').trim();
-            var mapUrl = 'https://uri.amap.com/search?keyword=' + encodeURIComponent(sName) + '&city=' + encodeURIComponent(cityName || '') + '&callnative=1';
-            return '<div class="shop-item"><span class="shop-addr">📍 ' + s + '</span><a href="' + mapUrl + '" target="_blank" rel="noopener" class="shop-nav-btn">导航</a></div>';
+            var navId = 'nav-btn-' + Date.now() + '-' + idx;
+            return '<div class="shop-item"><span class="shop-addr">📍 ' + s + '</span><a href="javascript:void(0)" id="' + navId + '" class="shop-nav-btn" data-sname="' + sName.replace(/"/g, '&quot;') + '" data-city="' + (cityName || '').replace(/"/g, '&quot;') + '">导航</a></div>';
         }).join('');
         shopContent.innerHTML = shopListHtml;
+        shopContent.querySelectorAll('.shop-nav-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var name = this.getAttribute('data-sname');
+                var city = this.getAttribute('data-city');
+                openNav(name, city);
+            });
+        });
     } else if (food.shop) {
         shopSection.classList.remove('hidden');
         var sName2 = food.shop.replace(/[（(].+?[）)]/, '').trim();
-        var mapUrl2 = 'https://uri.amap.com/search?keyword=' + encodeURIComponent(sName2) + '&city=' + encodeURIComponent(cityName || '') + '&callnative=1';
-        shopContent.innerHTML = '<div class="shop-item"><span class="shop-addr">📍 ' + food.shop + '</span><a href="' + mapUrl2 + '" target="_blank" rel="noopener" class="shop-nav-btn">导航</a></div>';
+        shopContent.innerHTML = '<div class="shop-item"><span class="shop-addr">📍 ' + food.shop + '</span><a href="javascript:void(0)" id="nav-btn-single" class="shop-nav-btn" data-sname="' + sName2.replace(/"/g, '&quot;') + '" data-city="' + (cityName || '').replace(/"/g, '&quot;') + '">导航</a></div>';
+        document.getElementById('nav-btn-single').addEventListener('click', function() {
+            var name = this.getAttribute('data-sname');
+            var city = this.getAttribute('data-city');
+            openNav(name, city);
+        });
     } else {
         shopSection.classList.add('hidden');
     }
