@@ -546,16 +546,8 @@ body {
 }
 
 /* ==================== 店铺列表样式 ==================== */
-.shop-link {
-    color: #555;
-    text-decoration: none;
-    display: block;
-    transition: color 0.2s;
-}
-.shop-link:hover {
-    color: #d4764e;
-    text-decoration: underline;
-}
+
+
 .shop-item {
     padding: 10px 14px;
     margin-bottom: 8px;
@@ -858,7 +850,7 @@ body {
                 <button class="modal-tab active" data-target="desc-section">简介</button>
                 <button class="modal-tab" data-target="story-section">故事</button>
                 <button class="modal-tab" data-target="compare-section">讲究</button>
-                <button class="modal-tab" data-target="shop-section">店铺</button>
+                <button class="modal-tab" data-target="shop-section">推荐</button>
             </div>
             <div class="modal-body-inner">
                 <div class="modal-section" id="desc-section">
@@ -1041,18 +1033,12 @@ function openModal(food, cityName, districtName) {
     if (food.shops && food.shops.length > 0) {
         shopSection.classList.remove('hidden');
         var shopListHtml = food.shops.map(function(s) {
-            var shopName = s.replace(/[（(].+?[）)]/, '').trim();
-            var shopAddr = (s.match(/[（(](.+?)[）)]/) || [,''])[1];
-            var mapUrl = 'https://uri.amap.com/navigation?to=' + encodeURIComponent(shopAddr || shopName) + '&name=' + encodeURIComponent(shopName) + '&mode=car&src=jsgourmet&policy=1';
-            return '<div class="shop-item"><a href="' + mapUrl + '" target="_blank" rel="noopener" class="shop-link">📍 ' + s + '</a></div>';
+            return '<div class="shop-item">📍 ' + s + '</div>';
         }).join('');
         shopContent.innerHTML = shopListHtml;
     } else if (food.shop) {
-        var shopName2 = food.shop.replace(/[（(].+?[）)]/, '').trim();
-        var shopAddr2 = (food.shop.match(/[（(](.+?)[）)]/) || [,''])[1];
-        var mapUrl2 = 'https://uri.amap.com/navigation?to=' + encodeURIComponent(shopAddr2 || shopName2) + '&name=' + encodeURIComponent(shopName2) + '&mode=car&src=jsgourmet&policy=1';
         shopSection.classList.remove('hidden');
-        shopContent.innerHTML = '<div class="shop-item"><a href="' + mapUrl2 + '" target="_blank" rel="noopener" class="shop-link">📍 ' + food.shop + '</a></div>';
+        shopContent.innerHTML = '<div class="shop-item">📍 ' + food.shop + '</div>';
     } else {
         shopSection.classList.add('hidden');
     }
